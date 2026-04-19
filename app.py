@@ -1,45 +1,44 @@
-from flask import Flask, render_template, request
+import os  # <--- THIS WAS THE MISSING PIECE!
 import pickle
 import numpy as np
-from waitress import serve # Gunicorn-alternative for easy serving
+from flask import Flask, render_template, request
 
 app = Flask(__name__)
 
 # Load the trained model
-with open('insurance_model.pkl', 'rb') as file:
-    model = pickle.load(file)
+try:
+    with open('insurance_model.pkl', 'rb') as file:
+        model = pickle.load(file)
+    print("✅ Model loaded successfully!")
+except Exception as e:
+    print(f"❌ Model load error: {e}")
 
 @app.route('/', methods=['GET', 'POST'])
 def home():
     prediction_text = None
     if request.method == 'POST':
         try:
-           # 1. Extract and process form data
+            # 1. Extract inputs from the form
             age = int(request.form['age'])
-            # 'sex' is usually dropped as a baseline if it's binary (Female/Male). 
-            # We only need 'Male' (1 or 0). If 0, the model knows it's Female.
-
             bmi = float(request.form['bmi'])
             children = int(request.form['children'])
-            is_smoker = 1 if request.form['smoker'] == 'yes' else 0
+            smoker = 1 if request.form['smoker'] == 'yes' else 0
 
-            # 2. Hand-craft the one-hot encoding for region (keeping 3 columns, 4th is baseline)
+            # 2. Region One-Hot Encoding (matching your 7-feature model)
             region_str = request.form['region']
-            region_northeast, region_northwest, region_southeast = 0, 0, 0
+            region_ne, region_nw, region_se = 0, 0, 0
 
             if region_str == 'northeast':
-                region_northeast = 1
+                region_ne = 1
             elif region_str == 'northwest':
-                region_northwest = 1
+                region_nw = 1
             elif region_str == 'southeast':
-                region_southeast = 1
+                region_se = 1
 
-            # 3. Create the 7-feature array (The "Input Vector")
-            # Order: [age, bmi, children, is_smoker, is_male, reg_ne, reg_nw, reg_se]
-            # Verify this order matches your X.columns in Jupyter!
+            # 3. Create the 7-feature array in correct order
             final_features = np.array([[
-                age, bmi, children, is_smoker, 
-                region_northeast, region_northwest, region_southeast
+                age, bmi, children, smoker, 
+                region_ne, region_nw, region_se
             ]])
 
             # 4. Make prediction
@@ -50,11 +49,10 @@ def home():
         except Exception as e:
             prediction_text = f'Error: {str(e)}. Please check your inputs.'
 
-    # Serve the page, either blank (GET) or with result (POST)
     return render_template('index.html', prediction_text=prediction_text)
 
+# RENDER DEPLOYMENT SETTINGS
 if __name__ == "__main__":
-    # Render provides a port through environment variables
-    # If it can't find one, it defaults to 5000 for local testing
+    # This detects the port Render wants, or defaults to 5000 for local testing
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
