@@ -1,4 +1,3 @@
-# Insurance-Predictor-Project
 # 🏥 HealthSync: Medical Insurance Premium Predictor
 [![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen)](https://insurance-predictor-project-dxdv.onrender.com)
 [![Python](https://img.shields.io/badge/Python-3.14-blue)](https://www.python.org/)
