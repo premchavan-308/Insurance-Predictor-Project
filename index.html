@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insurance Predictor | AI Service</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="main-container">
+        <h1>🏥 Medical Insurance Predictor</h1>
+        <p class="subtitle">Data-driven annual premium estimation using Machine Learning</p>
+        
+        <form action="/" method="post">
+            <div class="input-grid">
+                
+                <div class="form-group">
+                    <label for="age">Age</label>
+                    <input type="number" name="age" id="age" required min="18" max="100" placeholder="e.g., 28">
+                </div>
+
+                <div class="form-group">
+                    <label for="sex">Sex</label>
+                    <select name="sex" id="sex" required>
+                        <option value="" disabled selected>Select Sex</option>
+                        <option value="female">Female</option>
+                        <option value="male">Male</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="bmi">BMI (Body Mass Index)</label>
+                    <input type="number" step="0.1" name="bmi" id="bmi" required placeholder="e.g., 24.5">
+                </div>
+
+                <div class="form-group">
+                    <label for="children">Number of Children</label>
+                    <input type="number" name="children" id="children" required min="0" max="10" placeholder="e.g., 1">
+                </div>
+
+                <div class="form-group">
+                    <label for="smoker">Smoker Status</label>
+                    <select name="smoker" id="smoker" required>
+                        <option value="" disabled selected>Select Status</option>
+                        <option value="no">Non-Smoker</option>
+                        <option value="yes">Smoker</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="region">Region</label>
+                    <select name="region" id="region" required>
+                        <option value="" disabled selected>Select Region</option>
+                        <option value="northeast">Northeast</option>
+                        <option value="northwest">Northwest</option>
+                        <option value="southeast">Southeast</option>
+                        <option value="southwest">Southwest</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <button type="submit" class="btn-predict">Calculate Annual Estimate</button>
+        </form>
+
+        {% if prediction_text %}
+            <div class="result-box">
+                <h3>{{ prediction_text }}</h3>
+                <p style="font-size: 0.8rem; margin-top: 5px; color: #666;">
+                    *This is an estimate based on historical data.
+                </p>
+            </div>
+        {% endif %}
+    </div>
+</body>
+</html>
