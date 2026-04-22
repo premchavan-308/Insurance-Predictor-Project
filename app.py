@@ -42,10 +42,15 @@ def home():
             ]])
 
             # 4. Make prediction
-            prediction = model.predict(final_features)
-            output = round(prediction[0], 2)
-            prediction_text = f'Estimated Annual Insurance Charges: ${output}'
-
+            prediction_usd = model.predict(final_features)
+            # Conversion rate: 1 USD = 83.50 INR
+            prediction_inr = prediction_usd[0] * 83.50
+            
+            output = round(prediction_inr, 2)
+            
+            # Format with Rupee symbol and commas for Indian numbering system
+            prediction_text = f'Estimated Annual Insurance Charges: ₹{output:,}'
+        
         except Exception as e:
             prediction_text = f'Error: {str(e)}. Please check your inputs.'
 
